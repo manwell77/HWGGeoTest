@@ -73,12 +73,14 @@ var app = {
                         navButtonPress : function () {
                                 // go back to the previous page
                                 myapp.back();
-                        }
+                        }   
                 });
+                var mymap = new sap.ui.core.HTML("mymap", { content:"<script src='gps.js'></script><p id='mymap'></p>" });
+                mymap.placeAt("page2");
                 // add both pages to the app
                 myapp.addPage(page1).addPage(page2);
                 // place the app into the HTML document
-                myapp.placeAt("content");
+                myapp.placeAt("content");   
         });
                 
     }
