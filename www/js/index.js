@@ -50,7 +50,7 @@ var app = {
 
         console.log('Received Event: ' + id);
         */
-        /*
+        
         sap.ui.getCore().attachInit(function () {
                 // create a mobile app and display page1 initially
                 var myapp = new sap.m.App("myApp", {
@@ -84,15 +84,14 @@ var app = {
                 // place the app into the HTML document
                 myapp.placeAt("content");        
                 
-        });
-        */
+        });        
         
         // get current position
         var watchID = navigator.geolocation.watchPosition(onGPSSuccess, onGPSError, { enableHighAccuracy: true } );
         
         // place gps
         function onGPSSuccess(position) {
-                alert(position);
+                
                 var element = document.getElementById('mymap');
 
                 element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +

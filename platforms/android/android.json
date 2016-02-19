@@ -9,15 +9,15 @@
                 "parents": {
                     "/*": [
                         {
-                            "xml": "<feature name=\"Globalization\"><param name=\"android-package\" value=\"org.apache.cordova.globalization.Globalization\" /></feature>",
-                            "count": 1
-                        },
-                        {
                             "xml": "<feature name=\"Device\"><param name=\"android-package\" value=\"org.apache.cordova.device.Device\" /></feature>",
                             "count": 1
                         },
                         {
                             "xml": "<feature name=\"Notification\"><param name=\"android-package\" value=\"org.apache.cordova.dialogs.Notification\" /></feature>",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<feature name=\"Geolocation\"><param name=\"android-package\" value=\"org.apache.cordova.geolocation.Geolocation\" /></feature>",
                             "count": 1
                         },
                         {
@@ -29,20 +29,29 @@
             },
             "AndroidManifest.xml": {
                 "parents": {
-                    "/*": [],
+                    "/*": [
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_COARSE_LOCATION\" />",
+                            "count": 1
+                        },
+                        {
+                            "xml": "<uses-permission android:name=\"android.permission.ACCESS_FINE_LOCATION\" />",
+                            "count": 1
+                        }
+                    ],
                     "/manifest": []
                 }
             }
         }
     },
     "installed_plugins": {
-        "cordova-plugin-globalization": {
-            "PACKAGE_NAME": "com.coolappz.hwcgeotest"
-        },
         "cordova-plugin-device": {
             "PACKAGE_NAME": "com.coolappz.hwcgeotest"
         },
         "cordova-plugin-dialogs": {
+            "PACKAGE_NAME": "com.coolappz.hwcgeotest"
+        },
+        "cordova-plugin-geolocation": {
             "PACKAGE_NAME": "com.coolappz.hwcgeotest"
         },
         "cordova-plugin-whitelist": {
@@ -51,20 +60,6 @@
     },
     "dependent_plugins": {},
     "modules": [
-        {
-            "file": "plugins/cordova-plugin-globalization/www/GlobalizationError.js",
-            "id": "cordova-plugin-globalization.GlobalizationError",
-            "clobbers": [
-                "window.GlobalizationError"
-            ]
-        },
-        {
-            "file": "plugins/cordova-plugin-globalization/www/globalization.js",
-            "id": "cordova-plugin-globalization.globalization",
-            "clobbers": [
-                "navigator.globalization"
-            ]
-        },
         {
             "file": "plugins/cordova-plugin-device/www/device.js",
             "id": "cordova-plugin-device.device",
@@ -85,6 +80,18 @@
             "merges": [
                 "navigator.notification"
             ]
+        },
+        {
+            "file": "plugins/cordova-plugin-geolocation/www/android/geolocation.js",
+            "id": "cordova-plugin-geolocation.geolocation",
+            "clobbers": [
+                "navigator.geolocation"
+            ]
+        },
+        {
+            "file": "plugins/cordova-plugin-geolocation/www/PositionError.js",
+            "id": "cordova-plugin-geolocation.PositionError",
+            "runs": true
         },
         {
             "file": "plugins/cordova-plugin-whitelist/whitelist.js",
