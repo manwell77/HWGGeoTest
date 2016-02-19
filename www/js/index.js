@@ -53,7 +53,7 @@ var app = {
                 // create a mobile app and display page1 initially
                 var myapp = new sap.m.App("myApp", {
                         initialPage: "page1"
-                } );
+                });
                 // create the first page
                 var page1 = new sap.m.Page("page1", {
                         title : "Hello World",
