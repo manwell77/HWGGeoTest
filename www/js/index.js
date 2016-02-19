@@ -33,7 +33,25 @@ var app = {
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
     onDeviceReady: function() {
+        
+        var watchID = navigator.geolocation.watchPosition(onSuccess, onError, { enableHighAccuracy: true } )              
         app.receivedEvent('deviceready');
+        
+        function onGPSSuccess(position) {
+            
+                var element = document.getElementById('mymap');
+                
+                element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
+                                    'Longitude: '          + position.coords.longitude             + '<br />' +
+                                    'Altitude: '           + position.coords.altitude              + '<br />' +
+                                    'Accuracy: '           + position.coords.accuracy              + '<br />' +
+                                    'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
+                                    'Heading: '            + position.coords.heading               + '<br />' +
+                                    'Speed: '              + position.coords.speed                 + '<br />' +
+                                    'Timestamp: '          + position.timestamp                    + '<br />'; }
+
+        function onGPSError(error) { alert('code: ' + error.code    + '\n' + 'message: ' + error.message + '\n'); }
+        
     },
     // Update DOM on a Received Event
     receivedEvent: function(id) {
@@ -66,6 +84,8 @@ var app = {
                                 }
                         })
                 });
+                var mymap = new sap.ui.core.HTML("mymap", { content:"<p id='mymap'></p>" });
+                mymap.placeAt("page1");                
                 // create the second page with a back button
                 var page2 = new sap.m.Page("page2", {
                         title : "Hello Page 2",
@@ -75,28 +95,11 @@ var app = {
                                 myapp.back();
                         }   
                 });
-                var mymap = new sap.ui.core.HTML("mymap", { content:"<p id='mymap'></p>" });
-                mymap.placeAt("page2");
                 // add both pages to the app
                 myapp.addPage(page1).addPage(page2);
                 // place the app into the HTML document
                 myapp.placeAt("content");   
         });
-
-        navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError);
-
-        function onGPSSuccess(position) {
-                var element = document.getElementById('mymap');
-                element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
-                                    'Longitude: '          + position.coords.longitude             + '<br />' +
-                                    'Altitude: '           + position.coords.altitude              + '<br />' +
-                                    'Accuracy: '           + position.coords.accuracy              + '<br />' +
-                                    'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
-                                    'Heading: '            + position.coords.heading               + '<br />' +
-                                    'Speed: '              + position.coords.speed                 + '<br />' +
-                                    'Timestamp: '          + position.timestamp                    + '<br />'; }
-
-        function onGPSError(error) { alert('code: ' + error.code    + '\n' + 'message: ' + error.message + '\n'); }
 
     }
 };
