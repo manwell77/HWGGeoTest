@@ -75,14 +75,29 @@ var app = {
                                 myapp.back();
                         }   
                 });
-                var mymap = new sap.ui.core.HTML("mymap", { content:"<script src='gps.js'></script><p id='mymap'></p>" });
+                var mymap = new sap.ui.core.HTML("mymap", { content:"<p id='mymap'></p>" });
                 mymap.placeAt("page2");
                 // add both pages to the app
                 myapp.addPage(page1).addPage(page2);
                 // place the app into the HTML document
                 myapp.placeAt("content");   
         });
-                
+
+        navigator.geolocation.getCurrentPosition(onGPSSuccess, onGPSError);
+
+        function onGPSSuccess(position) {
+                var element = document.getElementById('mymap');
+                element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
+                                    'Longitude: '          + position.coords.longitude             + '<br />' +
+                                    'Altitude: '           + position.coords.altitude              + '<br />' +
+                                    'Accuracy: '           + position.coords.accuracy              + '<br />' +
+                                    'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
+                                    'Heading: '            + position.coords.heading               + '<br />' +
+                                    'Speed: '              + position.coords.speed                 + '<br />' +
+                                    'Timestamp: '          + position.timestamp                    + '<br />'; }
+
+        function onGPSError(error) { alert('code: ' + error.code    + '\n' + 'message: ' + error.message + '\n'); }
+
     }
 };
 
