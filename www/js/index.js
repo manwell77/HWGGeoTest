@@ -16,7 +16,17 @@
  * specific language governing permissions and limitations
  * under the License.
  */
+var gmap;
+
 var app = {
+    
+       // app global vars      
+        myapp:sap.m.App,
+        page1:sap.m.Page,
+        page2:sap.m.Page,
+        mapdiv:sap.ui.core.HTML,
+        watchID:String,
+        
     // Application Constructor
     initialize: function() {
         this.bindEvents();
@@ -49,15 +59,19 @@ var app = {
         receivedElement.setAttribute('style', 'display:block;');
 
         console.log('Received Event: ' + id);
-        */
+        */                    
         
+        // get current position
+        this.watchID = navigator.geolocation.watchPosition(this.onGPSSuccess,this.onGPSError,{ enableHighAccuracy: true });  
+                       
+        // ui5 init
         sap.ui.getCore().attachInit(function () {
                 // create a mobile app and display page1 initially
-                var myapp = new sap.m.App("myApp", {
+                this.myapp = new sap.m.App("myApp", {
                         initialPage: "page1"
                 });
                 // create the first page
-                var page1 = new sap.m.Page("page1", {
+                this.page1 = new sap.m.Page("page1", {
                         title : "Hello World",
                         showNavButton : false,
                         content : new sap.m.Button({
@@ -68,11 +82,14 @@ var app = {
                                 }
                         })
                 });
-                var mymap = new sap.ui.core.HTML("mymap", { content:"<div id='mymap'></div>" }).placeAt("page1");                         
-                var mapdiv = document.getElementById('mymap');                
-                var map = new google.maps.Map(mapdiv, { center: { lat: 44.540, lng: -78.546 }, zoom: 8 } );                
+                // maps
+                this.mapdiv = new sap.ui.core.HTML("mapdiv", { content:'<div id="mapdiv">PIPPO</div>' });
+                this.mapdiv.placeAt("page1");               
+        // mapdiv = document.getElementById("mymap");                
+        // map = new google.maps.Map(mapdiv, { center: { lat: 44.540, lng: -78.546 }, zoom: 8 } ); 
+                 
                 // create the second page with a back button
-                var page2 = new sap.m.Page("page2", {
+                this.page2 = new sap.m.Page("page2", {
                         title : "Hello Page 2",
                         showNavButton : true,
                         navButtonPress : function () {
@@ -81,36 +98,36 @@ var app = {
                         }   
                 });
                 // add both pages to the app
-                myapp.addPage(page1).addPage(page2);
+                this.myapp.addPage(page1).addPage(page2);
                 // place the app into the HTML document
-                myapp.placeAt("content");        
+                this.myapp.placeAt("content");        
                 
-        });        
+        });                      
         
-        // get current position
-        var watchID = navigator.geolocation.watchPosition(onGPSSuccess, onGPSError, { enableHighAccuracy: true } );        
-        
-        // place gps
-        function onGPSSuccess(position) {
-                             
-                // set map center
-                map.setCenter(new google.maps.LatLng(44.540,-78.546));
-                
-                /*
-                element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
-                                    'Longitude: '          + position.coords.longitude             + '<br />' +
-                                    'Altitude: '           + position.coords.altitude              + '<br />' +
-                                    'Accuracy: '           + position.coords.accuracy              + '<br />' +
-                                    'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
-                                    'Heading: '            + position.coords.heading               + '<br />' +
-                                    'Speed: '              + position.coords.speed                 + '<br />' +
-                                    'Timestamp: '          + position.timestamp                    + '<br />'; }
-                */
-        }
-           
-        function onGPSError(error) { alert('code: ' + error.code    + '\n' + 'message: ' + error.message + '\n'); }           
+    },
+    
+    // gps ok
+    onGPSSuccess: function(position) {
+
+            // set map center
+            //map.setCenter( new google.maps.LatLng(44.540,-78.546) );
+
+            document.getElementById('mapdiv').innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
+                                                          'Longitude: '          + position.coords.longitude             + '<br />' +
+                                                          'Altitude: '           + position.coords.altitude              + '<br />' +
+                                                          'Accuracy: '           + position.coords.accuracy              + '<br />' +
+                                                          'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
+                                                          'Heading: '            + position.coords.heading               + '<br />' +
+                                                          'Speed: '              + position.coords.speed                 + '<br />' +
+                                                          'Timestamp: '          + position.timestamp                    + '<br />'; 
+
+    },
+    
+    // gps ko
+    onGPSError: function(error) { alert('code: ' + error.code    + '\n' + 'message: ' + error.message + '\n'); }           
    
-    }
-};
+    };
 
 app.initialize();
+
+function mapsLoaded() { };
