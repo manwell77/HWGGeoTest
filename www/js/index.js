@@ -68,8 +68,9 @@ var app = {
                                 }
                         })
                 });
-                var mymap = new sap.ui.core.HTML("mymap", { content:"<p id='mymap'></p>" });
-                mymap.placeAt("page1");                
+                var mymap = new sap.ui.core.HTML("mymap", { content:"<div id='mymap'></div>" }).placeAt("page1");                         
+                var mapdiv = document.getElementById('mymap');                
+                var map = new google.maps.Map(mapdiv, { center: { lat: 44.540, lng: -78.546 }, zoom: 8 } );                
                 // create the second page with a back button
                 var page2 = new sap.m.Page("page2", {
                         title : "Hello Page 2",
@@ -87,13 +88,15 @@ var app = {
         });        
         
         // get current position
-        var watchID = navigator.geolocation.watchPosition(onGPSSuccess, onGPSError, { enableHighAccuracy: true } );
+        var watchID = navigator.geolocation.watchPosition(onGPSSuccess, onGPSError, { enableHighAccuracy: true } );        
         
         // place gps
         function onGPSSuccess(position) {
+                             
+                // set map center
+                map.setCenter(new google.maps.LatLng(44.540,-78.546));
                 
-                var element = document.getElementById('mymap');
-
+                /*
                 element.innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
                                     'Longitude: '          + position.coords.longitude             + '<br />' +
                                     'Altitude: '           + position.coords.altitude              + '<br />' +
@@ -102,7 +105,9 @@ var app = {
                                     'Heading: '            + position.coords.heading               + '<br />' +
                                     'Speed: '              + position.coords.speed                 + '<br />' +
                                     'Timestamp: '          + position.timestamp                    + '<br />'; }
-
+                */
+        }
+           
         function onGPSError(error) { alert('code: ' + error.code    + '\n' + 'message: ' + error.message + '\n'); }           
    
     }
