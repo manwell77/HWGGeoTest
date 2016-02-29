@@ -19,7 +19,7 @@
 
 var app = {
     
-    // app global vars      
+    // attributes      
     myapp:sap.m.App,
     watchID:String,
     gmap:google.maps.Map,
@@ -72,7 +72,7 @@ var app = {
         
     },
     
-    // gps ok
+    // gps ok callback
     onGPSSuccess: function(position) {
             
             // build gcoords
@@ -108,7 +108,7 @@ var app = {
 
     },
     
-    // gps ko
+    // gps ko callback
     onGPSError: function(error) { alert('code: ' + error.code    + '\n' + 'message: ' + error.message + '\n'); }           
    
     };
