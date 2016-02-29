@@ -19,51 +19,33 @@
 
 var app = {
     
-       // app global vars      
-        myapp:sap.m.App,
-        page1:sap.m.Page,
-        page2:sap.m.Page,
-        mapdiv:Element,
-        coodiv:Element,
-        watchID:String,
-        gmap:google.maps.Map,
+    // app global vars      
+    myapp:sap.m.App,
+    watchID:String,
+    gmap:google.maps.Map,
+    marker:google.maps.Marker,
+    circle:google.maps.Circle,
         
     // Application Constructor
-    initialize: function() {
-        this.bindEvents();
-    },
+    initialize: function() { this.bindEvents(); },
+    
     // Bind Event Listeners
     //
     // Bind any events that are required on startup. Common events are:
     // 'load', 'deviceready', 'offline', and 'online'.
-    bindEvents: function() {
-        document.addEventListener('deviceready', this.onDeviceReady, false);
-    },
+    bindEvents: function() { document.addEventListener('deviceready', this.onDeviceReady, false); },
+    
     // deviceready Event Handler
     //
     // The scope of 'this' is the event. In order to call the 'receivedEvent'
     // function, we must explicitly call 'app.receivedEvent(...);'
-    onDeviceReady: function() {
-                
-        app.receivedEvent('deviceready');        
-        
-    },
+    onDeviceReady: function() { app.receivedEvent('deviceready'); },
+    
     // Update DOM on a Received Event
     receivedEvent: function(id) {
         
-        /*
-        var parentElement = document.getElementById(id);
-        var listeningElement = parentElement.querySelector('.listening');
-        var receivedElement = parentElement.querySelector('.received');
-
-        listeningElement.setAttribute('style', 'display:none;');
-        receivedElement.setAttribute('style', 'display:block;');
-
-        console.log('Received Event: ' + id);
-        */                    
-        
         // get current position
-        this.watchID = navigator.geolocation.watchPosition(this.onGPSSuccess,this.onGPSError,{ enableHighAccuracy: true });  
+        this.watchID = navigator.geolocation.watchPosition(app.onGPSSuccess,app.onGPSError,{ enableHighAccuracy: true });  
                        
         // ui5 init
         sap.ui.getCore().attachInit(function () {
@@ -72,19 +54,16 @@ var app = {
                 this.myapp = new sap.m.App("myApp",{ initialPage:"page1"});
                 
                 // create the first page
-                this.page1 = new sap.m.Page("page1",{title:"GeoMe",showNavButton:false,headerContent:new sap.m.Button({text:"Detail",icon:"sap-icon://action",press:function(){myapp.to("page2");}})});                                          
-                                
-                // prepare div for maps
-                this.mapdiv = new sap.ui.core.HTML("mapdiv", { content:'<div id="mapdiv"></div>' }).placeAt("page1");       
+                page1 = new sap.m.Page("page1",{title:"GeoMe",showNavButton:false,headerContent:new sap.m.Button({text:"Detail",icon:"sap-icon://action",press:function(){myapp.getPage("page1").setVisible(false);myapp.getPage("page2").setVisible(true);myapp.to("page2");}})});                                          
+                page1.addContent(new sap.ui.core.HTML("mapdiv", { content:'<div id="mapdiv"></div>' }).placeAt("page1"));               
                 
                 // create the second page with a back button
-                this.page2 = new sap.m.Page("page2", {title:"Hello Page 2",showNavButton:true,navButtonPress:function(){myapp.back();}});
-                
-                // prepare div for cohordinates
-                this.coodiv = new sap.ui.core.HTML("coodiv", { content:'<div id="coodiv"></div>' }).placeAt("page2");  
+                page2 = new sap.m.Page("page2", {title:"Hello Page 2",showNavButton:true,navButtonPress:function(){myapp.getPage("page2").setVisible(false);myapp.getPage("page1").setVisible(true);myapp.back();}});
+                page2.addContent(new sap.ui.core.HTML("coodiv", { content:'<div id="coodiv"></div>' }).placeAt("page2"));
+                page2.setVisible(false);
                 
                 // add both pages to the app
-                this.myapp.addPage(this.page1).addPage(this.page2);
+                this.myapp.addPage(page1).addPage(page2);
                 
                 // place the app into the HTML document
                 this.myapp.placeAt("content");        
@@ -96,24 +75,36 @@ var app = {
     // gps ok
     onGPSSuccess: function(position) {
             
-            // build map
-            if (this.gmap == null) { this.gmap = new google.maps.Map(document.getElementById("mapdiv"), {center:{lat:position.coords.latitude,lng:position.coords.longitude},zoom:12}); }
+            // build gcoords
+            coords = new google.maps.LatLng(position.coords.latitude,position.coords.longitude);
             
-            // set map center
-            this.gmap.setCenter( new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
+            if (this.myapp.getPage("page1").getVisible() === true) {
+                            
+                // build map
+                if (jQuery.isEmptyObject(this.gmap)) {this.gmap=new google.maps.Map(document.getElementById("mapdiv"),{center:coords,zoom:16});} else {this.gmap.setCenter(coords);}            
+
+                // marker
+                if (jQuery.isEmptyObject(this.marker)) {this.marker=new google.maps.Marker({clickable:false,map:this.gmap,position:coords});} else {this.marker.setPosition(coords);}
+
+                // accuracy circle
+                if (jQuery.isEmptyObject(this.circle)) {this.circle=new google.maps.Circle({center:coords,clickable:false,fillColor:"blue",fillOpacity:0.15,map:this.gmap,radius:position.coords.accuracy,strokeColor:"blue",strokeOpacity:0.3,strokeWeight:2})} else {this.circle.setCenter(coords);this.circle.setRadius(position.coords.accuracy);}
+            }
             
-            // get div
-            this.coodiv = document.getElementById("coodiv");
-            
-            // set content
-            this.coodiv.innerHTML = 'Latitude: '          + position.coords.latitude         + '<br />' +
-                                    'Longitude: '         + position.coords.longitude        + '<br />' +
-                                    'Altitude: '          + position.coords.altitude         + '<br />' +
-                                    'Accuracy: '          + position.coords.accuracy         + '<br />' +
-                                    'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '<br />' +
-                                    'Heading: '           + position.coords.heading          + '<br />' +
-                                    'Speed: '             + position.coords.speed            + '<br />' +
-                                    'Timestamp: '         + position.timestamp               + '<br />';             
+            if (this.myapp.getPage("page2").getVisible() === true) {
+                            
+                // get div
+                coodiv = document.getElementById("coodiv");
+
+                // set content
+                coodiv.innerHTML = 'Latitude: '          + position.coords.latitude         + '<br />' +
+                                   'Longitude: '         + position.coords.longitude        + '<br />' +
+                                   'Altitude: '          + position.coords.altitude         + '<br />' +
+                                   'Accuracy: '          + position.coords.accuracy         + '<br />' +
+                                   'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '<br />' +
+                                   'Heading: '           + position.coords.heading          + '<br />' +
+                                   'Speed: '             + position.coords.speed            + '<br />' +
+                                   'Timestamp: '         + position.timestamp               + '<br />';
+            }
 
     },
     
