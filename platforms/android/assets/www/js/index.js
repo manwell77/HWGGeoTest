@@ -16,7 +16,6 @@
  * specific language governing permissions and limitations
  * under the License.
  */
-var gmap;
 
 var app = {
     
@@ -25,6 +24,7 @@ var app = {
         page1:sap.m.Page,
         page2:sap.m.Page,
         mapdiv:Element,
+        coodiv:Element,
         watchID:String,
         gmap:google.maps.Map,
         
@@ -72,19 +72,19 @@ var app = {
                 this.myapp = new sap.m.App("myApp",{ initialPage:"page1"});
                 
                 // create the first page
-                this.page1 = new sap.m.Page("page1",{ title:"Geolocalize Me",showNavButton:true,
-                        // navButtonPress : function () { myapp.to("page2"); }                                          
-                        content: new sap.m.Button({text:"Go to Page 2",navButtonPress:function(){this.myapp.to("page2");}})});
-                
-                
+                this.page1 = new sap.m.Page("page1",{title:"GeoMe",showNavButton:false,headerContent:new sap.m.Button({text:"Detail",icon:"sap-icon://action",press:function(){myapp.to("page2");}})});                                          
+                                
                 // prepare div for maps
                 this.mapdiv = new sap.ui.core.HTML("mapdiv", { content:'<div id="mapdiv"></div>' }).placeAt("page1");       
                 
                 // create the second page with a back button
-                this.page2 = new sap.m.Page("page2", {title:"Hello Page 2",showNavButton:true,navButtonPress:function(){this.myapp.back();}});
+                this.page2 = new sap.m.Page("page2", {title:"Hello Page 2",showNavButton:true,navButtonPress:function(){myapp.back();}});
+                
+                // prepare div for cohordinates
+                this.coodiv = new sap.ui.core.HTML("coodiv", { content:'<div id="coodiv"></div>' }).placeAt("page2");  
                 
                 // add both pages to the app
-                this.myapp.addPage(page1).addPage(page2);
+                this.myapp.addPage(this.page1).addPage(this.page2);
                 
                 // place the app into the HTML document
                 this.myapp.placeAt("content");        
@@ -98,20 +98,22 @@ var app = {
             
             // build map
             if (this.gmap == null) { this.gmap = new google.maps.Map(document.getElementById("mapdiv"), {center:{lat:position.coords.latitude,lng:position.coords.longitude},zoom:12}); }
+            
             // set map center
             this.gmap.setCenter( new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
             
-        /*     
-            this.mapdiv = document.getElementById("mapdiv");
-            this.mapdiv.innerHTML = 'Latitude: '          + position.coords.latitude         + '<br />' +
+            // get div
+            this.coodiv = document.getElementById("coodiv");
+            
+            // set content
+            this.coodiv.innerHTML = 'Latitude: '          + position.coords.latitude         + '<br />' +
                                     'Longitude: '         + position.coords.longitude        + '<br />' +
                                     'Altitude: '          + position.coords.altitude         + '<br />' +
                                     'Accuracy: '          + position.coords.accuracy         + '<br />' +
                                     'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '<br />' +
                                     'Heading: '           + position.coords.heading          + '<br />' +
                                     'Speed: '             + position.coords.speed            + '<br />' +
-                                    'Timestamp: '         + position.timestamp               + '<br />'; 
-            */ 
+                                    'Timestamp: '         + position.timestamp               + '<br />';             
 
     },
     
