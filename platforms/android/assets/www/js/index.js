@@ -24,8 +24,9 @@ var app = {
         myapp:sap.m.App,
         page1:sap.m.Page,
         page2:sap.m.Page,
-        mapdiv:sap.ui.core.HTML,
+        mapdiv:Element,
         watchID:String,
+        gmap:google.maps.Map,
         
     // Application Constructor
     initialize: function() {
@@ -66,39 +67,25 @@ var app = {
                        
         // ui5 init
         sap.ui.getCore().attachInit(function () {
+            
                 // create a mobile app and display page1 initially
-                this.myapp = new sap.m.App("myApp", {
-                        initialPage: "page1"
-                });
+                this.myapp = new sap.m.App("myApp",{ initialPage:"page1"});
+                
                 // create the first page
-                this.page1 = new sap.m.Page("page1", {
-                        title : "Hello World",
-                        showNavButton : false,
-                        content : new sap.m.Button({
-                                text : "Go to Page 2",
-                                press : function () {
-                                        // navigate to page2
-                                        myapp.to("page2");
-                                }
-                        })
-                });
-                // maps
-                this.mapdiv = new sap.ui.core.HTML("mapdiv", { content:'<div id="mapdiv">PIPPO</div>' });
-                this.mapdiv.placeAt("page1");               
-        // mapdiv = document.getElementById("mymap");                
-        // map = new google.maps.Map(mapdiv, { center: { lat: 44.540, lng: -78.546 }, zoom: 8 } ); 
-                 
+                this.page1 = new sap.m.Page("page1",{ title:"Geolocalize Me",showNavButton:true,
+                        // navButtonPress : function () { myapp.to("page2"); }                                          
+                        content: new sap.m.Button({text:"Go to Page 2",navButtonPress:function(){this.myapp.to("page2");}})});
+                
+                
+                // prepare div for maps
+                this.mapdiv = new sap.ui.core.HTML("mapdiv", { content:'<div id="mapdiv"></div>' }).placeAt("page1");       
+                
                 // create the second page with a back button
-                this.page2 = new sap.m.Page("page2", {
-                        title : "Hello Page 2",
-                        showNavButton : true,
-                        navButtonPress : function () {
-                                // go back to the previous page
-                                myapp.back();
-                        }   
-                });
+                this.page2 = new sap.m.Page("page2", {title:"Hello Page 2",showNavButton:true,navButtonPress:function(){this.myapp.back();}});
+                
                 // add both pages to the app
                 this.myapp.addPage(page1).addPage(page2);
+                
                 // place the app into the HTML document
                 this.myapp.placeAt("content");        
                 
@@ -108,18 +95,23 @@ var app = {
     
     // gps ok
     onGPSSuccess: function(position) {
-
+            
+            // build map
+            if (this.gmap == null) { this.gmap = new google.maps.Map(document.getElementById("mapdiv"), {center:{lat:position.coords.latitude,lng:position.coords.longitude},zoom:12}); }
             // set map center
-            //map.setCenter( new google.maps.LatLng(44.540,-78.546) );
-
-            document.getElementById('mapdiv').innerHTML = 'Latitude: '           + position.coords.latitude              + '<br />' +
-                                                          'Longitude: '          + position.coords.longitude             + '<br />' +
-                                                          'Altitude: '           + position.coords.altitude              + '<br />' +
-                                                          'Accuracy: '           + position.coords.accuracy              + '<br />' +
-                                                          'Altitude Accuracy: '  + position.coords.altitudeAccuracy      + '<br />' +
-                                                          'Heading: '            + position.coords.heading               + '<br />' +
-                                                          'Speed: '              + position.coords.speed                 + '<br />' +
-                                                          'Timestamp: '          + position.timestamp                    + '<br />'; 
+            this.gmap.setCenter( new google.maps.LatLng(position.coords.latitude,position.coords.longitude));
+            
+        /*     
+            this.mapdiv = document.getElementById("mapdiv");
+            this.mapdiv.innerHTML = 'Latitude: '          + position.coords.latitude         + '<br />' +
+                                    'Longitude: '         + position.coords.longitude        + '<br />' +
+                                    'Altitude: '          + position.coords.altitude         + '<br />' +
+                                    'Accuracy: '          + position.coords.accuracy         + '<br />' +
+                                    'Altitude Accuracy: ' + position.coords.altitudeAccuracy + '<br />' +
+                                    'Heading: '           + position.coords.heading          + '<br />' +
+                                    'Speed: '             + position.coords.speed            + '<br />' +
+                                    'Timestamp: '         + position.timestamp               + '<br />'; 
+            */ 
 
     },
     
@@ -129,5 +121,3 @@ var app = {
     };
 
 app.initialize();
-
-function mapsLoaded() { };
